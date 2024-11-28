@@ -1,0 +1,60 @@
+CREATE TABLE student
+(
+  sCode     VARCHAR(10) NOT NULL,
+  sName     VARCHAR(50) NOT NULL,
+  sAge      INT         NOT NULL,
+  sContact  VARCHAR(20) NOT NULL,
+  seContact VARCHAR(20) NOT NULL,
+  sCSchool  VARCHAR(50) NOT NULL,
+  sESchool  VARCHAR(50) NULL     DEFAULT "-",
+  sMSchool  VARCHAR(50) NULL     DEFAULT "-",
+  sHSchool  VARCHAR(50) NULL     DEFAULT "-",
+  PRIMARY KEY (sCode)
+);
+
+CREATE TABLE teacher
+(
+  tCode    VARCHAR(10) NOT NULL,
+  tName    VARCHAR(50) NOT NULL,
+  tContact VARCHAR(20) NOT NULL,
+  tGrade   INT         NOT NULL CHECK (tGrade IN (0,1)) COMMENT '0:관리자, 1:선생님',
+  PRIMARY KEY (tCode)
+);
+
+CREATE TABLE class
+(
+  cCode VARCHAR(10) NOT NULL,
+  cName VARCHAR(50) NOT NULL,
+  tMain VARCHAR(10) NOT NULL,
+  tSub  VARCHAR(10) NULL DEFAULT NULL,
+  PRIMARY KEY (cCode),
+  CONSTRAINT FK_teacher_TO_class FOREIGN KEY (tMain) REFERENCES teacher (tCode),
+  CONSTRAINT FK_teacher_TO_class1 FOREIGN KEY (tSub) REFERENCES teacher (tCode)
+);
+
+CREATE TABLE classList
+(
+  cCode VARCHAR(10) NOT NULL,
+  sCode VARCHAR(10) NOT NULL,
+  PRIMARY KEY (cCode, sCode),
+  CONSTRAINT FK_student_TO_classList FOREIGN KEY (sCode) REFERENCES student (sCode),
+  CONSTRAINT FK_class_TO_classList FOREIGN KEY (cCode) REFERENCES class (cCode)
+);
+
+
+CREATE TABLE studyData
+(
+  data   DATE        NOT NULL CHECK (data = DATE(data)),
+  sCode  VARCHAR(10) NOT NULL,
+  cCode  VARCHAR(10) NOT NULL,
+  score1 FLOAT       NULL,
+  score2 FLOAT       NULL,
+  score3 FLOAT       NULL,
+  score4 FLOAT       NULL,
+  tCode  VARCHAR(10) NOT NULL,
+  PRIMARY KEY (data, sCode, cCode),
+  CONSTRAINT FK_student_TO_studyData FOREIGN KEY (sCode) REFERENCES student (sCode),
+  CONSTRAINT FK_teacher_TO_studyData FOREIGN KEY (tCode) REFERENCES teacher (tCode),
+  CONSTRAINT FK_class_TO_studyData FOREIGN KEY (cCode) REFERENCES class (cCode)
+);
+
