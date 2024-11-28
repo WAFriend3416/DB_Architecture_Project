@@ -21,15 +21,15 @@ CREATE TABLE teacher
   PRIMARY KEY (tCode)
 );
 
-CREATE TABLE class
+CREATE TABLE classroom
 (
   cCode VARCHAR(10) NOT NULL,
   cName VARCHAR(50) NOT NULL,
   tMain VARCHAR(10) NOT NULL,
   tSub  VARCHAR(10) NULL DEFAULT NULL,
   PRIMARY KEY (cCode),
-  CONSTRAINT FK_teacher_TO_class FOREIGN KEY (tMain) REFERENCES teacher (tCode),
-  CONSTRAINT FK_teacher_TO_class1 FOREIGN KEY (tSub) REFERENCES teacher (tCode)
+  CONSTRAINT FK_teacher_TO_classroom FOREIGN KEY (tMain) REFERENCES teacher (tCode),
+  CONSTRAINT FK_teacher_TO_classroom1 FOREIGN KEY (tSub) REFERENCES teacher (tCode)
 );
 
 CREATE TABLE classList
@@ -38,7 +38,7 @@ CREATE TABLE classList
   sCode VARCHAR(10) NOT NULL,
   PRIMARY KEY (cCode, sCode),
   CONSTRAINT FK_student_TO_classList FOREIGN KEY (sCode) REFERENCES student (sCode),
-  CONSTRAINT FK_class_TO_classList FOREIGN KEY (cCode) REFERENCES class (cCode)
+  CONSTRAINT FK_classroom_TO_classList FOREIGN KEY (cCode) REFERENCES classroom (cCode)
 );
 
 
@@ -55,6 +55,5 @@ CREATE TABLE studyData
   PRIMARY KEY (data, sCode, cCode),
   CONSTRAINT FK_student_TO_studyData FOREIGN KEY (sCode) REFERENCES student (sCode),
   CONSTRAINT FK_teacher_TO_studyData FOREIGN KEY (tCode) REFERENCES teacher (tCode),
-  CONSTRAINT FK_class_TO_studyData FOREIGN KEY (cCode) REFERENCES class (cCode)
+  CONSTRAINT FK_classroom_TO_studyData FOREIGN KEY (cCode) REFERENCES classroom (cCode)
 );
-

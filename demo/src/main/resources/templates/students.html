@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>학생 목록</title>
+</head>
+<body>
+    <h1>학생 목록</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>학생 코드</th>
+                <th>이름</th>
+                <th>나이</th>
+                <th>연락처</th>
+                <th>비상연락처</th>
+                <th>현재학교</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="student : ${students}">
+                <td th:text="${student.sCode}"></td>
+                <td th:text="${student.sName}"></td>
+                <td th:text="${student.sAge}"></td>
+                <td th:text="${student.sContact}"></td>
+                <td th:text="${student.seContact}"></td>
+                <td th:text="${student.sCSchool}"></td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
