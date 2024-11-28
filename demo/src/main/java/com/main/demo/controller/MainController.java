@@ -9,6 +9,6 @@ public class MainController {
     @GetMapping("/main")
     public String mainPage() {
         System.out.println("MainController.mainPage() 호출됨");
-        return "blank";
+        return "blank2";
     }
 }
