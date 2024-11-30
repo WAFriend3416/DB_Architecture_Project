@@ -1,8 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 
 <head>
-
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -13,25 +12,19 @@
 
     <!-- Custom fonts for this template-->
     <link href="/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-    <link
-        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
 
     <!-- Custom styles for this template-->
     <link href="/css/sb-admin-2.min.css" rel="stylesheet">
-
 </head>
 
 <body id="page-top">
-
     <!-- Page Wrapper -->
     <div id="wrapper">
-
         <!-- Sidebar -->
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-
             <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" th:href="@{/main}">
                 <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-laugh-wink"></i>
                 </div>
@@ -43,9 +36,10 @@
 
             <!-- Nav Item - Dashboard -->
             <li class="nav-item">
-                <a class="nav-link" href="index.html">
+                <a class="nav-link" th:href="@{/main}">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>대시보드</span></a>
+                    <span>대시보드</span>
+                </a>
             </li>
 
             <!-- Divider -->
@@ -66,8 +60,8 @@
                 <div id="collapseClass" class="collapse" aria-labelledby="headingClass" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">수업 관련 데이터를 관리합니다.</h6>
-                        <a class="collapse-item" >수업 목록</a>
-                        <a class="collapse-item" >수업별 학생 관리</a>
+                        <a class="collapse-item" th:href="@{/classes}">수업 목록</a>
+                        <a class="collapse-item" th:href="@{/class-students}">수업별 학생 관리</a>
                     </div>
                 </div>
             </li>
@@ -83,9 +77,9 @@
                     data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">학생 관련 데이터를 관리합니다.</h6>
-                        <a class="collapse-item" >학생목록</a>
-                        <a class="collapse-item" >학생 출결 관리</a>
-                        <a class="collapse-item" >학생 결제 관리</a>
+                        <a class="collapse-item" th:href="@{/students}">학생목록</a>
+                        <a class="collapse-item" th:href="@{/student-attendance}">학생 출결 관리</a>
+                        <a class="collapse-item" th:href="@{/student-payment}">학생 결제 관리</a>
                     </div>
                 </div>
             </li>
@@ -100,12 +94,13 @@
                     data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">선생님 관련 데이터를 관리합니다.</h6>
-                        <a class="collapse-item" >선생님 목록</a>
-                        <a class="collapse-item" >선생님 분반 현황</a>
-                        <a class="collapse-item" >선생님 급여 관리</a>
+                        <a class="collapse-item" th:href="@{/teachers}">선생님 목록</a>
+                        <a class="collapse-item" th:href="@{/teacher-classes}">선생님 분반 현황</a>
+                        <a class="collapse-item" th:href="@{/teacher-salary}">선생님 급여 관리</a>
                     </div>
                 </div>
             </li>
+
             <!-- Divider -->
             <hr class="sidebar-divider">
 
@@ -116,15 +111,17 @@
 
             <!-- Nav Item - Charts -->
             <li class="nav-item">
-                <a class="nav-link" >
+                <a class="nav-link" th:href="@{/learning-data}">
                     <i class="fas fa-fw fa-chart-area"></i>
-                    <span>학습 데이터 목록</span></a>
+                    <span>학습 데이터 목록</span>
+                </a>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link" >
+                <a class="nav-link" th:href="@{/learning-data/register}">
                     <i class="fas fa-pen-square"></i>
-                    <span>학습 데이터 등록</span></a>
+                    <span>학습 데이터 등록</span>
+                </a>
             </li>
 
             <!-- Divider -->
@@ -132,9 +129,10 @@
 
             <!-- Nav Item - Tables -->
             <li class="nav-item">
-                <a class="nav-link" href="tables.html">
+                <a class="nav-link" th:href="@{/settings}">
                     <i class="fas fa-cogs"></i>
-                    <span>환경설정</span></a>
+                    <span>환경설정</span>
+                </a>
             </li>
 
             <hr class="sidebar-divider d-none d-md-block">
@@ -143,16 +141,13 @@
             <div class="text-center d-none d-md-inline">
                 <button class="rounded-circle border-0" id="sidebarToggle"></button>
             </div>
-
         </ul>
         <!-- End of Sidebar -->
 
         <!-- Content Wrapper -->
         <div id="content-wrapper" class="d-flex flex-column">
-
             <!-- Main Content -->
             <div id="content">
-
                 <!-- Topbar -->
                 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
                     <!-- Sidebar Toggle (Topbar) -->
@@ -198,14 +193,10 @@
                 <!-- End of Topbar -->
 
                 <!-- Begin Page Content -->
-                <div class="container-fluid">
-                    <!-- Page Heading -->
-                    <h1 class="h3 mb-4 text-gray-800">학생 관리</h1>
-                    
-                   
+                <div layout:fragment="content">
+                    <!-- 이 부분이 각 페이지의 컨텐츠로 교체됩니다 -->
                 </div>
-                <!-- /.container-fluid -->
-
+                <!-- End of Page Content -->
             </div>
             <!-- End of Main Content -->
 
@@ -218,10 +209,8 @@
                 </div>
             </footer>
             <!-- End of Footer -->
-
         </div>
         <!-- End of Content Wrapper -->
-
     </div>
     <!-- End of Page Wrapper -->
 
@@ -238,7 +227,7 @@
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true"> x </span>
+                        <span aria-hidden="true">×</span>
                     </button>
                 </div>
                 <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
@@ -260,60 +249,8 @@
     <!-- Custom scripts for all pages-->
     <script src="/js/sb-admin-2.min.js"></script>
 
-    <!-- Add Student Modal -->
-    <div class="modal fade" id="addStudentModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">학생 추가</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form>
-                        <div class="mb-3">
-                            <label class="form-label">학생 코드</label>
-                            <input type="text" class="form-control" name="sCode">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">이름</label>
-                            <input type="text" class="form-control" name="sName">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">나이</label>
-                            <input type="number" class="form-control" name="sAge">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">연락처</label>
-                            <input type="text" class="form-control" name="sContact">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">보호자 연락처</label>
-                            <input type="text" class="form-control" name="seContact">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">초등학교</label>
-                            <input type="text" class="form-control" name="sCSchool">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">중학교</label>
-                            <input type="text" class="form-control" name="sMSchool">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">고등학교</label>
-                            <input type="text" class="form-control" name="sHSchool">
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
-                    <button type="button" class="btn btn-primary">저장</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    <!-- 추가 스크립트를 위한 영역 -->
+    <th:block layout:fragment="script"></th:block>
 </body>
 
 </html>

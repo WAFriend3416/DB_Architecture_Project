@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>학생 관리</title>
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i&amp;display=swap">
+    <link rel="stylesheet" href="assets/fonts/fontawesome-all.min.css">
+</head>
+
+<body id="page-top">
+    <div id="wrapper">
+        <nav class="navbar navbar-dark align-items-start sidebar sidebar-dark accordion bg-gradient-primary p-0">
+            <div class="container-fluid d-flex flex-column p-0"><a class="navbar-brand d-flex justify-content-center align-items-center sidebar-brand m-0" href="#">
+                    <div class="sidebar-brand-icon rotate-n-15"><i class="fas fa-laugh-wink"></i></div>
+                    <div class="sidebar-brand-text mx-3"><span>학원 관리</span></div>
+                </a>
+                <hr class="sidebar-divider my-0">
+                <ul class="navbar-nav text-light" id="accordionSidebar">
+                    <li class="nav-item"><a class="nav-link active" href="students"><i class="fas fa-user"></i><span>학생 관리</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="teachers"><i class="fas fa-chalkboard-teacher"></i><span>선생님 관리</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="classes"><i class="fas fa-table"></i><span>수업 관리</span></a></li>
+                </ul>
+            </div>
+        </nav>
+        <div class="d-flex flex-column" id="content-wrapper">
+            <div id="content">
+                <nav class="navbar navbar-light navbar-expand bg-white shadow mb-4 topbar static-top">
+                    <div class="container-fluid">
+                        <button class="btn btn-link d-md-none rounded-circle me-3" id="sidebarToggleTop" type="button"><i class="fas fa-bars"></i></button>
+                        <h3 class="text-dark mb-0">학생 목록</h3>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStudentModal">
+                            <i class="fas fa-user-plus"></i> 학생 추가
+                        </button>
+                    </div>
+                </nav>
+                <div class="container-fluid">
+                    <div class="card shadow">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>학생 코드</th>
+                                            <th>이름</th>
+                                            <th>나이</th>
+                                            <th>연락처</th>
+                                            <th>보호자 연락처</th>
+                                            <th>초등학교</th>
+                                            <th>중학교</th>
+                                            <th>고등학교</th>
+                                            <th>관리</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="student : ${students}">
+                                            <td th:text="${student.sCode}"></td>
+                                            <td th:text="${student.sName}"></td>
+                                            <td th:text="${student.sAge}"></td>
+                                            <td th:text="${student.sContact}"></td>
+                                            <td th:text="${student.seContact}"></td>
+                                            <td th:text="${student.sCSchool}"></td>
+                                            <td th:text="${student.sMSchool}"></td>
+                                            <td th:text="${student.sHSchool}"></td>
+                                            <td>
+                                                <button class="btn btn-primary btn-sm"><i class="fas fa-edit"></i></button>
+                                                <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <footer class="bg-white sticky-footer">
+                <div class="container my-auto">
+                    <div class="text-center my-auto copyright"><span>Copyright © Brand 2024</span></div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- 학생 추가 모달 -->
+    <div class="modal fade" id="addStudentModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">학생 추가</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label class="form-label">학생 코드</label>
+                            <input type="text" class="form-control" name="sCode">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">이름</label>
+                            <input type="text" class="form-control" name="sName">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">나이</label>
+                            <input type="number" class="form-control" name="sAge">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">연락처</label>
+                            <input type="text" class="form-control" name="sContact">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">보호자 연락처</label>
+                            <input type="text" class="form-control" name="seContact">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">초등학교</label>
+                            <input type="text" class="form-control" name="sCSchool">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">중학교</label>
+                            <input type="text" class="form-control" name="sMSchool">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">고등학교</label>
+                            <input type="text" class="form-control" name="sHSchool">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary">저장</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/js/theme.js"></script>
+</body>
+
+</html>
