@@ -7,7 +7,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -35,28 +37,6 @@ public class ClassStudentController {
                 .collect(Collectors.toList());
 
             return ResponseEntity.ok(students);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
-    @GetMapping("/available")
-    public ResponseEntity<?> getAvailableStudents(@PathVariable String cCode) {
-        try {
-            Classroom classroom = classroomRepository.findById(cCode)
-                .orElseThrow(() -> new RuntimeException("분반을 찾을 수 없습니다."));
-
-            List<Student> enrolledStudents = classListRepository.findByClassroom(classroom)
-                .stream()
-                .map(ClassList::getStudent)
-                .collect(Collectors.toList());
-
-            List<Student> allStudents = studentRepository.findAll();
-            List<Student> availableStudents = allStudents.stream()
-                .filter(student -> !enrolledStudents.contains(student))
-                .collect(Collectors.toList());
-
-            return ResponseEntity.ok(availableStudents);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -113,6 +93,57 @@ public class ClassStudentController {
         try {
             ClassListId classListId = new ClassListId(cCode, sCode);
             classListRepository.deleteById(classListId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/{cCode}/available-students")
+    public ResponseEntity<?> getAvailableStudents(@PathVariable String cCode) {
+        try {
+            Classroom classroom = classroomRepository.findById(cCode)
+                .orElseThrow(() -> new RuntimeException("분반을 찾을 수 없습니다."));
+
+            Set<String> enrolledStudentIds = classListRepository.findByClassroom(classroom)
+                .stream()
+                .map(classList -> classList.getStudent().getSCode())
+                .collect(Collectors.toSet());
+
+            List<Student> availableStudents = studentRepository.findAll()
+                .stream()
+                .filter(student -> !enrolledStudentIds.contains(student.getSCode()))
+                .collect(Collectors.toList());
+
+            return ResponseEntity.ok(availableStudents);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/{cCode}/students")
+    public ResponseEntity<?> addStudentsToClass(
+            @PathVariable String cCode,
+            @RequestBody List<String> studentCodes) {
+        try {
+            Classroom classroom = classroomRepository.findById(cCode)
+                .orElseThrow(() -> new RuntimeException("분반을 찾을 수 없습니다."));
+
+            List<ClassList> newClassLists = new ArrayList<>();
+            
+            for (String sCode : studentCodes) {
+                Student student = studentRepository.findById(sCode)
+                    .orElseThrow(() -> new RuntimeException("학생을 찾을 수 없습니다: " + sCode));
+
+                ClassList classList = new ClassList();
+                classList.setId(new ClassListId(cCode, sCode));
+                classList.setClassroom(classroom);
+                classList.setStudent(student);
+                
+                newClassLists.add(classList);
+            }
+
+            classListRepository.saveAll(newClassLists);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());

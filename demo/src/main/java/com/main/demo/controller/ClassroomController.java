@@ -105,25 +105,23 @@ public class ClassroomController {
             Classroom classroom = classroomRepository.findById(cCode)
                 .orElseThrow(() -> new RuntimeException("분반을 찾을 수 없습니다: " + cCode));
             
-            try {
-                // 해당 분반의 모든 수강 정보를 먼저 삭제
-                List<ClassList> classLists = classListRepository.findByClassroom(classroom);
-                classListRepository.deleteAll(classLists);
-                
-                // 분반 삭제
-                classroomRepository.delete(classroom);
-                
-                return ResponseEntity.ok().build();
-                
-            } catch (Exception e) {
-                e.printStackTrace(); // 서버 로그에 에러 출력
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("분반 삭제 중 오류 발생: " + e.getMessage());
+            // 해당 분반의 학생 수 확인
+            List<ClassList> classLists = classListRepository.findByClassroom(classroom);
+            if (!classLists.isEmpty()) {
+                return ResponseEntity
+                    .badRequest()
+                    .body("이 분반에 등록된 학생이 있어 삭제할 수 없습니다. "
+                        + "먼저 등록된 학생을 모두 제거해주세요.");
             }
+            
+            // 분반 삭제
+            classroomRepository.delete(classroom);
+            return ResponseEntity.ok().build();
+            
         } catch (Exception e) {
-            e.printStackTrace(); // 서버 로그에 에러 출력
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body("분반을 찾을 수 없습니다: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("분반 삭제 중 오류 발생: " + e.getMessage());
         }
     }
 } 

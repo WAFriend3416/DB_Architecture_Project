@@ -16,9 +16,9 @@ public class StudyDataId implements Serializable {
     @Column(name = "date_column")
     private LocalDate date_column;
     
-    @Column(name = "s_code")
+    @Column(name = "sCode")
     private String sCode;
     
-    @Column(name = "c_code")
+    @Column(name = "cCode")
     private String cCode;
 }

@@ -5,8 +5,231 @@
 
 <div layout:fragment="content">
     <div class="container-fluid">
-        <h1 class="h3 mb-4 text-gray-800">학습 데이터 목록</h1>
+        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <h1 class="h3 mb-0 text-gray-800">학습 데이터 관리</h1>
+            <div>
+                <button id="refreshBtn" class="btn btn-info mr-2" type="button">
+                    <i class="fas fa-sync-alt"></i> 새로고침
+                </button>
+            </div>
+        </div>
+
+        <!-- 분반 및 학생 선택 -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <label for="classSelect">분반 선택</label>
+                <select id="classSelect" class="form-control">
+                    <option value="">분반을 선택하세요</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="studentSelect">학생 선택</label>
+                <select id="studentSelect" class="form-control" disabled>
+                    <option value="">학생을 선택하세요</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 학습 데이터 테이블 -->
+        <div class="card shadow mb-4">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>날짜</th>
+                                <th>점수1</th>
+                                <th>점수2</th>
+                                <th>점수3</th>
+                                <th>점수4</th>
+                                <th>담당 교사</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
+<th:block layout:fragment="script">
+    <!-- DataTables -->
+    <link href="/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <script src="/vendor/datatables/jquery.dataTables.min.js"></script>
+    <script src="/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+    
+    <script>
+    $(document).ready(function() {
+        console.log("Page loaded"); // 디버깅용
+        
+        // DataTable 초기화
+        var table = $('#dataTable').DataTable({
+            processing: true,
+            language: {
+                processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">로딩중...</span>',
+                emptyTable: "데이터가 없습니다",
+                info: "_START_ - _END_ / _TOTAL_",
+                infoEmpty: "0 - 0 / 0",
+                infoFiltered: "(총 _MAX_ 개)",
+                lengthMenu: "페이지당 _MENU_ 개씩 보기",
+                search: "검색:",
+                zeroRecords: "검색 결과가 없습니다"
+            },
+            serverSide: false,
+            columns: [
+                { 
+                    data: 'id.date_column',
+                    render: function(data) {
+                        // 기본 Date 객체 사용
+                        if (data) {
+                            const date = new Date(data);
+                            return date.getFullYear() + '-' + 
+                                   String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+                                   String(date.getDate()).padStart(2, '0');
+                        }
+                        return '';
+                    }
+                },
+                { data: 'score1' },
+                { data: 'score2' },
+                { data: 'score3' },
+                { data: 'score4' },
+                { 
+                    data: 'teacher',
+                    render: function(data) {
+                        return data ? data.tName : '';
+                    }
+                }
+            ]
+        });
+
+        // 분반 목록 로드
+        $.ajax({
+            url: '/api/classes/refresh',
+            type: 'GET',
+            success: function(classes) {
+                console.log('Loaded classes:', classes); // 디버깅용
+                classes.forEach(function(classroom) {
+                    $('#classSelect').append(
+                        $('<option>', {
+                            value: classroom.cCode,
+                            text: classroom.cName
+                        })
+                    );
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error('Error loading classes:', error);
+                alert('분반 목록을 불러오는데 실패했습니다.');
+            }
+        });
+
+        // 분반 선택 이벤트
+        $('#classSelect').change(function() {
+            var selectedClass = $(this).val();
+            $('#studentSelect').empty().append('<option value="">학생을 선택하세요</option>').prop('disabled', true);
+            table.clear().draw();
+            
+            if (selectedClass) {
+                loadStudents(selectedClass);
+            }
+        });
+
+        // 학생 선택 이벤트
+        $('#studentSelect').change(function() {
+            var selectedStudent = $(this).val();
+            if (selectedStudent) {
+                loadStudyData(selectedStudent);
+            } else {
+                table.clear().draw();
+            }
+        });
+
+        // 새로고침 버튼 클릭 이벤트
+        $('#refreshBtn').click(function() {
+            var selectedStudent = $('#studentSelect').val();
+            if (selectedStudent) {
+                loadStudyData(selectedStudent);
+            }
+        });
+
+        // 학생 목록 로드 함수
+        function loadStudents(classCode) {
+            $.ajax({
+                url: '/api/class-students/' + classCode + '/students',
+                type: 'GET',
+                success: function(students) {
+                    console.log('Loaded students:', students); // 디버깅용
+                    students.forEach(function(student) {
+                        $('#studentSelect').append(
+                            $('<option>', {
+                                value: student.sCode,
+                                text: student.sName
+                            })
+                        );
+                    });
+                    $('#studentSelect').prop('disabled', false);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error loading students:', error);
+                    alert('학생 목록을 불러오는데 실패했습니다.');
+                }
+            });
+        }
+
+        // 학습 데이터 로드 함수
+        function loadStudyData(studentCode) {
+            $.ajax({
+                url: '/api/study-data/student/' + studentCode,
+                type: 'GET',
+                success: function(data) {
+                    console.log('Loaded study data:', data); // 디버깅용
+                    table.clear();
+                    table.rows.add(data);
+                    table.draw();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error loading study data:', error);
+                    alert('학습 데이터를 불러오는데 실패했습니다.');
+                }
+            });
+        }
+    });
+    </script>
+</th:block>
+
+<style>
+    .dataTables_processing {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        padding: 1em;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        z-index: 1000;
+    }
+
+    .table.loading {
+        position: relative;
+    }
+
+    .table.loading:after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.7);
+        z-index: 1;
+    }
+
+    .fa-spin {
+        color: #4e73df;
+    }
+</style>
 </html>
