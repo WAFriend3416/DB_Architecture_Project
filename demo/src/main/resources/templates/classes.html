@@ -249,19 +249,7 @@
         $(document).on('click', '.delete-btn', function() {
             var cCode = $(this).data('ccode');
             
-            if (confirm('정말로 이 분반을 삭제하시겠습니까?')) {
-                $.ajax({
-                    url: '/api/classes/' + cCode,
-                    type: 'DELETE',
-                    success: function(response) {
-                        alert('분반이 삭제되었습니다.');
-                        table.ajax.reload();
-                    },
-                    error: function(xhr, status, error) {
-                        alert('삭제 실패: ' + error);
-                    }
-                });
-            }
+            deleteClassroom(cCode);
         });
 
         // 선생님 목록 로드
@@ -297,6 +285,27 @@
         $('#addClassModal').on('show.bs.modal', function() {
             loadTeachers();
         });
+
+        function deleteClassroom(cCode) {
+            if (!confirm('정말 이 분반을 삭제하시겠습니까?')) {
+                return;
+            }
+
+            $.ajax({
+                url: '/api/classes/' + cCode,
+                type: 'DELETE',
+                success: function(response) {
+                    alert('분반이 삭제되었습니다.');
+                    location.reload(); // 페이지 새로고침
+                },
+                error: function(xhr, status, error) {
+                    console.error('Status:', status);
+                    console.error('Error:', error);
+                    console.error('Response:', xhr.responseText);
+                    alert('삭제 중 오류가 발생했습니다: ' + (xhr.responseText || error));
+                }
+            });
+        }
     });
     </script>
 </th:block>

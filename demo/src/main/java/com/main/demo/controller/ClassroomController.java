@@ -6,6 +6,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import com.main.demo.model.entity.Classroom;
 import com.main.demo.repository.ClassroomRepository;
+import com.main.demo.repository.ClassListRepository;
+import com.main.demo.model.entity.ClassList;
 
 import java.util.List;
 
@@ -15,6 +17,9 @@ public class ClassroomController {
     
     @Autowired
     private ClassroomRepository classroomRepository;
+    
+    @Autowired
+    private ClassListRepository classListRepository;
     
     @GetMapping("/classes")
     public String classesPage() {
@@ -94,18 +99,31 @@ public class ClassroomController {
     }
 
     @DeleteMapping("/api/classes/{cCode}")
-    @ResponseBody
-    public ResponseEntity<?> deleteClass(@PathVariable String cCode) {
+    public ResponseEntity<?> deleteClassroom(@PathVariable String cCode) {
         try {
-            if (!classroomRepository.existsById(cCode)) {
-                return ResponseEntity.notFound().build();
+            // 분반 존재 여부 확인
+            Classroom classroom = classroomRepository.findById(cCode)
+                .orElseThrow(() -> new RuntimeException("분반을 찾을 수 없습니다: " + cCode));
+            
+            try {
+                // 해당 분반의 모든 수강 정보를 먼저 삭제
+                List<ClassList> classLists = classListRepository.findByClassroom(classroom);
+                classListRepository.deleteAll(classLists);
+                
+                // 분반 삭제
+                classroomRepository.delete(classroom);
+                
+                return ResponseEntity.ok().build();
+                
+            } catch (Exception e) {
+                e.printStackTrace(); // 서버 로그에 에러 출력
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("분반 삭제 중 오류 발생: " + e.getMessage());
             }
-            classroomRepository.deleteById(cCode);
-            return ResponseEntity.ok().build();
         } catch (Exception e) {
-            return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("분반 삭제 중 오류가 발생했습니다: " + e.getMessage());
+            e.printStackTrace(); // 서버 로그에 에러 출력
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body("분반을 찾을 수 없습니다: " + e.getMessage());
         }
     }
 } 

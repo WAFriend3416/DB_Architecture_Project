@@ -6,7 +6,126 @@
 <div layout:fragment="content">
     <div class="container-fluid">
         <h1 class="h3 mb-4 text-gray-800">분반별 학생 관리</h1>
+        
+        <!-- 분반 선택 드롭다운 -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <select id="classSelect" class="form-control">
+                    <option value="">분반을 선택하세요</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 학생 목록 테이블 -->
+        <div class="card shadow mb-4">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="studentTable" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>학생 코드</th>
+                                <th>이름</th>
+                                <th>나이</th>
+                                <th>현재 학교</th>
+                                <th>관리</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+<th:block layout:fragment="script">
+    <script>
+        $(document).ready(function() {
+            // 분반 목록 로드
+            $.ajax({
+                url: '/api/classes/refresh',
+                type: 'GET',
+                success: function(classes) {
+                    classes.forEach(function(classroom) {
+                        $('#classSelect').append(
+                            $('<option>', {
+                                value: classroom.cCode,
+                                text: classroom.cName
+                            })
+                        );
+                    });
+                }
+            });
+
+            // 분반 선택 이벤트
+            $('#classSelect').change(function() {
+                var selectedClass = $(this).val();
+                if (selectedClass) {
+                    loadStudents(selectedClass);
+                } else {
+                    $('#studentTable tbody').empty();
+                }
+            });
+
+            // 학생 목록 로드 함수
+            function loadStudents(classCode) {
+                $.ajax({
+                    url: '/api/class-students/' + classCode + '/students',
+                    type: 'GET',
+                    success: function(students) {
+                        var tbody = $('#studentTable tbody');
+                        tbody.empty();
+                        
+                        students.forEach(function(student) {
+                            let currentSchool = student.sCSchool || '미등록';
+                            
+                            var row = $('<tr>').append(
+                                $('<td>').text(student.sCode),
+                                $('<td>').text(student.sName),
+                                $('<td>').text(student.sAge),
+                                $('<td>').text(currentSchool),
+                                $('<td>').html(
+                                    '<button class="btn btn-danger btn-sm delete-btn" ' +
+                                    'data-scode="' + student.sCode + '">' +
+                                    '<i class="fas fa-trash"></i> 삭제</button>'
+                                )
+                            );
+                            tbody.append(row);
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error:', xhr.responseText);
+                        alert('학생 목록을 불러오는데 실패했습니다.');
+                    }
+                });
+            }
+
+            // 삭제 버튼 클릭 이벤트
+            // 삭제 버튼 클릭 이벤트 (동적으로 생성된 요소에 대한 이벤트 바인딩)
+            $('#studentTable').on('click', '.delete-btn', function() {
+                if (!confirm('정말 이 학생을 분반에서 삭제하시겠습니까?')) {
+                    return;
+                }
+
+                var sCode = $(this).data('scode');
+                var cCode = $('#classSelect').val();
+
+                $.ajax({
+                    url: '/api/class-students/' + cCode + '/students/' + sCode,
+                    type: 'DELETE',
+                    success: function(response) {
+                        alert('학생이 분반에서 삭제되었습니다.');
+                        loadStudents(cCode);  // 목록 새로고침
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error:', xhr.responseText);
+                        alert('삭제 중 오류가 발생했습니다: ' + error);
+                    }
+                });
+            });
+        });
+    </script>
+</th:block>
 
 </html>

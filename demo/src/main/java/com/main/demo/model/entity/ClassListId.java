@@ -16,4 +16,12 @@ public class ClassListId implements Serializable {
     
     @Column(name = "cCode")
     private String cCode;
+    
+    public ClassListId() {
+    }
+    
+    public ClassListId(String cCode, String sCode) {
+        this.cCode = cCode;
+        this.sCode = sCode;
+    }
 } 
