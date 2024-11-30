@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+
+<div layout:fragment="content">
+    <div class="container-fluid">
+        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <h1 class="h3 mb-0 text-gray-800">학생 목록</h1>
+            <div>
+                <button id="refreshBtn" class="btn btn-info mr-2" type="button">
+                    <i class="fas fa-sync-alt"></i> 새로고침
+                </button>
+                <button id="addStudentBtn" class="btn btn-primary" type="button">
+                    <i class="fas fa-user-plus"></i> 학생 추가
+                </button>
+            </div>
+        </div>
+
+        <div class="card shadow mb-4">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>학생 코드</th>
+                                <th>이름</th>
+                                <th>나이</th>
+                                <th>연락처</th>
+                                <th>보호자 연락처</th>
+                                <th>재학중인 학교</th>
+                                <th>초등학교</th>
+                                <th>중학교</th>
+                                <th>고등학교</th>
+                                <th>관리</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="student : ${students}">
+                                <td th:text="${student.sCode}"></td>
+                                <td th:text="${student.sName}"></td>
+                                <td th:text="${student.sAge}"></td>
+                                <td th:text="${student.sContact}"></td>
+                                <td th:text="${student.seContact}"></td>
+                                <td th:text="${student.sCSchool}"></td>
+                                <td th:text="${student.sESchool}"></td>
+                                <td th:text="${student.sMSchool}"></td>
+                                <td th:text="${student.sHSchool}"></td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm edit-btn" th:attr="data-scode=${student.sCode}">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm delete-btn" th:attr="data-scode=${student.sCode}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addStudentModal" tabindex="-1" role="dialog" aria-labelledby="addStudentModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addStudentModalLabel">학생 추가</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="addStudentForm">
+                        <div class="row">
+                            <!-- 왼쪽 컬럼 -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>학생 코드 <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="sCode" required maxlength="10">
+                                </div>
+                                <div class="form-group">
+                                    <label>이름 <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="sName" required maxlength="50">
+                                </div>
+                                <div class="form-group">
+                                    <label>나이 <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" name="sAge" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>연락처 <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="sContact" required maxlength="20">
+                                </div>
+                                <div class="form-group">
+                                    <label>보호자 연락처 <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="seContact" required maxlength="20">
+                                </div>
+                            </div>
+                            
+                            <!-- 오른쪽 컬럼 -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>재학중인 학교 <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="sCSchool" required maxlength="50">
+                                </div>
+                                <div class="form-group">
+                                    <label>초등학교 <span class="text-danger"></span></label>
+                                    <input type="text" class="form-control" name="sESchool" required maxlength="50">
+                                </div>
+                                <div class="form-group">
+                                    <label>중학교</label>
+                                    <input type="text" class="form-control" name="sMSchool" maxlength="50">
+                                </div>
+                                <div class="form-group">
+                                    <label>고등학교</label>
+                                    <input type="text" class="form-control" name="sHSchool" maxlength="50">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" id="saveStudent" data-mode="add">저장</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<th:block layout:fragment="script">
+    <!-- DataTables -->
+    <link href="/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <script src="/vendor/datatables/jquery.dataTables.min.js"></script>
+    <script src="/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+    
+    <script>
+    $(document).ready(function() {
+        // DataTable 초기화
+        var table = $('#dataTable').DataTable({
+            // 로딩 표시 활성화
+            processing: true,
+            // 로딩 메시지 커스터마이징
+            language: {
+                processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">로딩중...</span>'
+            },
+            // 서버 사이드 처리 설정
+            serverSide: false,
+            // 초기 데이터 로드
+            ajax: {
+                url: '/api/students/refresh',
+                type: 'GET',
+                dataSrc: '',
+                // AJAX 요청 시작 시 로딩 표시
+                beforeSend: function() {
+                    $('#dataTable').addClass('loading');
+                },
+                // AJAX 요청 완료 시 로딩 표시 제거
+                complete: function() {
+                    $('#dataTable').removeClass('loading');
+                }
+            },
+            columns: [
+                { data: 'sCode' },
+                { data: 'sName' },
+                { data: 'sAge' },
+                { data: 'sContact' },
+                { data: 'seContact' },
+                { data: 'sCSchool' },
+                { data: 'sESchool' },
+                { data: 'sMSchool' },
+                { data: 'sHSchool' },
+                { 
+                    data: null,
+                    orderable: false,
+                    searchable: false,
+                    render: function(data, type, row) {
+                        return `
+                            <button class="btn btn-primary btn-sm edit-btn" 
+                                    data-scode="${row.sCode}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-danger btn-sm delete-btn" 
+                                    data-scode="${row.sCode}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        `;
+                    }
+                }
+            ],
+            // 기타 설정
+            responsive: true,
+            language: {
+                emptyTable: "데이터가 없습니다",
+                info: "_START_ - _END_ / _TOTAL_",
+                infoEmpty: "0 - 0 / 0",
+                infoFiltered: "(총 _MAX_ 개)",
+                lengthMenu: "페이지당 _MENU_ 개씩 보기",
+                loadingRecords: "로딩중...",
+                processing: "처리중...",
+                search: "검색:",
+                zeroRecords: "검색 결과가 없습니다"
+            }
+        });
+
+        // 새로고침 버튼 클릭 이벤트
+        $('#refreshBtn').on('click', function() {
+            var $btn = $(this);
+            $btn.prop('disabled', true)
+                .find('i')
+                .removeClass('fa-sync-alt')
+                .addClass('fa-spinner fa-spin');
+            
+            table.ajax.reload(function() {
+                // 로딩 완료 후 버튼 상태 복원
+                $btn.prop('disabled', false)
+                    .find('i')
+                    .removeClass('fa-spinner fa-spin')
+                    .addClass('fa-sync-alt');
+            });
+        });
+
+        // 삭제 버튼 클릭 이벤트
+        $(document).on('click', '.delete-btn', function() {
+            var sCode = $(this).data('scode');
+            
+            if (confirm('정말로 이 학생의 정보를 삭제하시겠습니까?')) {
+                $.ajax({
+                    url: '/api/students/' + sCode,
+                    type: 'DELETE',
+                    success: function(response) {
+                        alert('학생 정보가 삭제되었습니다.');
+                        table.ajax.reload(); // DataTable 새로고침
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("삭제 실패:", error);
+                        alert('삭제 실패: ' + error);
+                    }
+                });
+            }
+        });
+
+        // 수정 버튼 클릭 이벤트
+        $(document).on('click', '.edit-btn', function() {
+            console.log('수정 버튼 클릭됨');  // 디버깅용
+            var sCode = $(this).data('scode');
+            console.log('학생 코드:', sCode);  // 디버깅용
+            
+            // 현재 행의 데이터 가져오기
+            var row = table.row($(this).closest('tr')).data();
+            console.log('행 데이터:', row);  // 디버깅용
+            
+            if (!row) {
+                console.error('행 데이터를 가져올 수 없습니다.');
+                return;
+            }
+            
+            // 모달 제목 변경
+            $('#addStudentModalLabel').text('학생 정보 수정');
+            
+            try {
+                // 폼에 데이터 채우기
+                $('input[name="sCode"]').val(row.sCode).prop('readonly', true);
+                $('input[name="sName"]').val(row.sName);
+                $('input[name="sAge"]').val(row.sAge);
+                $('input[name="sContact"]').val(row.sContact);
+                $('input[name="seContact"]').val(row.seContact);
+                $('input[name="sCSchool"]').val(row.sCSchool);
+                $('input[name="sESchool"]').val(row.sESchool);
+                $('input[name="sMSchool"]').val(row.sMSchool);
+                $('input[name="sHSchool"]').val(row.sHSchool);
+                
+                // 저장 버튼의 모드를 수정으로 변경
+                $('#saveStudent').data('mode', 'edit');
+                
+                // 모달 표시
+                $('#addStudentModal').modal('show');
+                console.log('모달이 표시되어야 합니다.');  // 디버깅용
+            } catch (error) {
+                console.error('데이터 설정 중 오류 발생:', error);
+            }
+        });
+
+        // 저장 버튼 클릭 이벤트 수정
+        $('#saveStudent').on('click', function() {
+            var mode = $(this).data('mode');
+            var formData = {};
+            
+            // 폼 데이터 수집
+            $('#addStudentForm').serializeArray().forEach(function(item) {
+                formData[item.name] = item.value;
+            });
+            
+            // API 엔드포인트와 메서드 설정
+            var url = '/api/students';
+            var method = 'POST';
+            
+            if (mode === 'edit') {
+                url += '/' + formData.sCode;
+                method = 'PUT';
+            }
+            
+            // AJAX 요청
+            $.ajax({
+                url: url,
+                type: method,
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function(response) {
+                    alert(mode === 'edit' ? '학생 정보가 수정되었습니다.' : '학생이 추가되었습니다.');
+                    $('#addStudentModal').modal('hide');
+                    table.ajax.reload();
+                },
+                error: function(xhr, status, error) {
+                    alert('오류가 발생했습니다: ' + error);
+                }
+            });
+        });
+
+        // 모달이 닫힐 때 초기화
+        $('#addStudentModal').on('hidden.bs.modal', function () {
+            $('#addStudentForm')[0].reset();
+            $('input[name="sCode"]').prop('readonly', false);
+            $('#addStudentModalLabel').text('학생 추가');
+            $('#saveStudent').data('mode', 'add');
+        });
+    });
+    </script>
+</th:block>
+
+<style>
+    /* 로딩 스피너 스타일 */
+    .dataTables_processing {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        padding: 1em;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        z-index: 1000;
+    }
+
+    /* 테이블 로딩 중 스타일 */
+    .table.loading {
+        position: relative;
+    }
+
+    .table.loading:after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.7);
+        z-index: 1;
+    }
+
+    /* 스피너 애니메이션 */
+    .fa-spin {
+        color: #4e73df;
+    }
+</style>
+</html> 

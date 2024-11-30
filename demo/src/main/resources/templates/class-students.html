@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+
+<div layout:fragment="content">
+    <div class="container-fluid">
+        <h1 class="h3 mb-4 text-gray-800">분반별 학생 관리</h1>
+        
+        <!-- 분반 선택 드롭다운 -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <select id="classSelect" class="form-control">
+                    <option value="">분반을 선택하세요</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button id="addStudentsBtn" class="btn btn-primary" disabled>
+                    <i class="fas fa-plus"></i> 학생 추가
+                </button>
+            </div>
+        </div>
+
+        <!-- 학생 목록 테이블 -->
+        <div class="card shadow mb-4">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="studentTable" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>학생 코드</th>
+                                <th>이름</th>
+                                <th>나이</th>
+                                <th>현재 학교</th>
+                                <th>관리</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 학생 추가 모달 -->
+        <div class="modal fade" id="addStudentsModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">학생 추가</h5>
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="availableStudentsTable">
+                                <thead>
+                                    <tr>
+                                        <th>선택</th>
+                                        <th>학생 코드</th>
+                                        <th>이름</th>
+                                        <th>나이</th>
+                                        <th>현재 학교</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+                        <button type="button" class="btn btn-primary" id="saveStudents">추가</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="script">
+    <script>
+        $(document).ready(function() {
+            // 분반 목록 로드
+            $.ajax({
+                url: '/api/classes/refresh',
+                type: 'GET',
+                success: function(classes) {
+                    classes.forEach(function(classroom) {
+                        $('#classSelect').append(
+                            $('<option>', {
+                                value: classroom.cCode,
+                                text: classroom.cName
+                            })
+                        );
+                    });
+                }
+            });
+
+            // 분반 선택 이벤트
+            $('#classSelect').change(function() {
+                var selectedClass = $(this).val();
+                if (selectedClass) {
+                    loadStudents(selectedClass);
+                } else {
+                    $('#studentTable tbody').empty();
+                }
+            });
+
+            // 학생 목록 로드 함수
+            function loadStudents(classCode) {
+                $.ajax({
+                    url: '/api/class-students/' + classCode + '/students',
+                    type: 'GET',
+                    success: function(students) {
+                        var tbody = $('#studentTable tbody');
+                        tbody.empty();
+                        
+                        students.forEach(function(student) {
+                            let currentSchool = student.sCSchool || '미등록';
+                            
+                            var row = $('<tr>').append(
+                                $('<td>').text(student.sCode),
+                                $('<td>').text(student.sName),
+                                $('<td>').text(student.sAge),
+                                $('<td>').text(currentSchool),
+                                $('<td>').html(
+                                    '<button class="btn btn-danger btn-sm delete-btn" ' +
+                                    'data-scode="' + student.sCode + '">' +
+                                    '<i class="fas fa-trash"></i> 삭제</button>'
+                                )
+                            );
+                            tbody.append(row);
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error:', xhr.responseText);
+                        alert('학생 목록을 불러오는데 실패했습니다.');
+                    }
+                });
+            }
+
+            // 삭제 버튼 클릭 이벤트
+            // 삭제 버튼 클릭 이벤트 (동적으로 생성된 요소에 대한 이벤트 바인딩)
+            $('#studentTable').on('click', '.delete-btn', function() {
+                if (!confirm('정말 이 학생을 분반에서 삭제하시겠습니까?')) {
+                    return;
+                }
+
+                var sCode = $(this).data('scode');
+                var cCode = $('#classSelect').val();
+
+                $.ajax({
+                    url: '/api/class-students/' + cCode + '/students/' + sCode,
+                    type: 'DELETE',
+                    success: function(response) {
+                        alert('학생이 분반에서 삭제되었습니다.');
+                        loadStudents(cCode);  // 목록 새로고침
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error:', xhr.responseText);
+                        alert('삭제 중 오류가 발생했습니다: ' + error);
+                    }
+                });
+            });
+
+            // 분반 선택 시 추가 버튼 활성화
+            $('#classSelect').change(function() {
+                $('#addStudentsBtn').prop('disabled', !$(this).val());
+            });
+
+            // 학생 추가 버튼 클릭
+            $('#addStudentsBtn').click(function() {
+                var selectedClass = $('#classSelect').val();
+                if (selectedClass) {
+                    loadAvailableStudents(selectedClass);
+                    $('#addStudentsModal').modal('show');
+                }
+            });
+
+            // 추가 가능한 학생 목록 로드
+            function loadAvailableStudents(classCode) {
+                $.ajax({
+                    url: '/api/class-students/' + classCode + '/available-students',
+                    type: 'GET',
+                    success: function(students) {
+                        var tbody = $('#availableStudentsTable tbody');
+                        tbody.empty();
+                        
+                        students.forEach(function(student) {
+                            let currentSchool = student.sCSchool || '미등록';
+                            
+                            var row = $('<tr>').append(
+                                $('<td>').html('<input type="checkbox" class="student-select" value="' + student.sCode + '">'),
+                                $('<td>').text(student.sCode),
+                                $('<td>').text(student.sName),
+                                $('<td>').text(student.sAge),
+                                $('<td>').text(currentSchool)
+                            );
+                            tbody.append(row);
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        alert('학생 목록을 불러오는데 실패했습니다.');
+                        $('#addStudentsModal').modal('hide');
+                    }
+                });
+            }
+
+            // 선택한 학생들 추가
+            $('#saveStudents').click(function() {
+                var selectedClass = $('#classSelect').val();
+                var selectedStudents = [];
+                
+                $('.student-select:checked').each(function() {
+                    selectedStudents.push($(this).val());
+                });
+
+                if (selectedStudents.length === 0) {
+                    alert('추가할 학생을 선택해주세요.');
+                    return;
+                }
+
+                $.ajax({
+                    url: '/api/class-students/' + selectedClass + '/students',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(selectedStudents),
+                    success: function(response) {
+                        alert('선택한 학생들이 추가되었습니다.');
+                        $('#addStudentsModal').modal('hide');
+                        loadStudents(selectedClass);  // 학생 목록 새로고침
+                    },
+                    error: function(xhr, status, error) {
+                        alert('학생 추가 중 오류가 발생했습니다.');
+                    }
+                });
+            });
+        });
+    </script>
+</th:block>
+
+</html>
