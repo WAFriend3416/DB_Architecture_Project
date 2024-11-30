@@ -47,7 +47,7 @@
                                 <td th:text="${student.sMSchool}"></td>
                                 <td th:text="${student.sHSchool}"></td>
                                 <td>
-                                    <button class="btn btn-primary btn-sm edit-btn">
+                                    <button class="btn btn-primary btn-sm edit-btn" th:attr="data-scode=${student.sCode}">
                                         <i class="fas fa-edit"></i>
                                     </button>
                                     <button class="btn btn-danger btn-sm delete-btn" th:attr="data-scode=${student.sCode}">
@@ -241,6 +241,91 @@
                     }
                 });
             }
+        });
+
+        // 수정 버튼 클릭 이벤트
+        $(document).on('click', '.edit-btn', function() {
+            console.log('수정 버튼 클릭됨');  // 디버깅용
+            var sCode = $(this).data('scode');
+            console.log('학생 코드:', sCode);  // 디버깅용
+            
+            // 현재 행의 데이터 가져오기
+            var row = table.row($(this).closest('tr')).data();
+            console.log('행 데이터:', row);  // 디버깅용
+            
+            if (!row) {
+                console.error('행 데이터를 가져올 수 없습니다.');
+                return;
+            }
+            
+            // 모달 제목 변경
+            $('#addStudentModalLabel').text('학생 정보 수정');
+            
+            try {
+                // 폼에 데이터 채우기
+                $('input[name="sCode"]').val(row.sCode).prop('readonly', true);
+                $('input[name="sName"]').val(row.sName);
+                $('input[name="sAge"]').val(row.sAge);
+                $('input[name="sContact"]').val(row.sContact);
+                $('input[name="seContact"]').val(row.seContact);
+                $('input[name="sCSchool"]').val(row.sCSchool);
+                $('input[name="sESchool"]').val(row.sESchool);
+                $('input[name="sMSchool"]').val(row.sMSchool);
+                $('input[name="sHSchool"]').val(row.sHSchool);
+                
+                // 저장 버튼의 모드를 수정으로 변경
+                $('#saveStudent').data('mode', 'edit');
+                
+                // 모달 표시
+                $('#addStudentModal').modal('show');
+                console.log('모달이 표시되어야 합니다.');  // 디버깅용
+            } catch (error) {
+                console.error('데이터 설정 중 오류 발생:', error);
+            }
+        });
+
+        // 저장 버튼 클릭 이벤트 수정
+        $('#saveStudent').on('click', function() {
+            var mode = $(this).data('mode');
+            var formData = {};
+            
+            // 폼 데이터 수집
+            $('#addStudentForm').serializeArray().forEach(function(item) {
+                formData[item.name] = item.value;
+            });
+            
+            // API 엔드포인트와 메서드 설정
+            var url = '/api/students';
+            var method = 'POST';
+            
+            if (mode === 'edit') {
+                url += '/' + formData.sCode;
+                method = 'PUT';
+            }
+            
+            // AJAX 요청
+            $.ajax({
+                url: url,
+                type: method,
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function(response) {
+                    alert(mode === 'edit' ? '학생 정보가 수정되었습니다.' : '학생이 추가되었습니다.');
+                    $('#addStudentModal').modal('hide');
+                    table.ajax.reload();
+                },
+                error: function(xhr, status, error) {
+                    alert('오류가 발생했습니다: ' + error);
+                }
+            });
+        });
+
+        // 모달이 닫힐 때 초기화
+        $('#addStudentModal').on('hidden.bs.modal', function () {
+            $('#addStudentForm')[0].reset();
+            $('input[name="sCode"]').prop('readonly', false);
+            $('#addStudentModalLabel').text('학생 추가');
+            $('#saveStudent').data('mode', 'add');
         });
     });
     </script>
