@@ -1,49 +1,71 @@
 # Math Academy Information System (MAIS)
 
-MAIS는 수학 학원을 위한 종합 관리 시스템입니다. 학생, 교사, 수업, 학습 데이터를 효율적으로 관리할 수 있는 웹 기반 솔루션입니다.
+## 📚 프로젝트 소개
 
-## 기술 스택
+MAIS(Math Academy Information System)는 현대적인 수학 학원을 위한 종합 관리 시스템입니다. 학생, 교사, 수업 및 학습 데이터를 효율적으로 관리할 수 있는 웹 기반 솔루션을 제공합니다.
+
+### 🎯 주요 특징
+- 직관적인 대시보드를 통한 실시간 현황 파악
+- 체계적인 학생 및 교사 관리 시스템
+- 효율적인 분반 관리 및 학습 데이터 분석
+- 반응형 웹 디자인
+
+## 🛠 기술 스택
 
 ### Backend
-- Java 8+
-- Spring Boot
-- Spring MVC
-- Spring Data JPA
-- MySQL
+<p align="left">
+    <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/java/java-original.svg" alt="java" width="40" height="40"/>
+    <img src="https://www.vectorlogo.zone/logos/springio/springio-icon.svg" alt="spring" width="40" height="40"/>
+    <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/mysql/mysql-original-wordmark.svg" alt="mysql" width="40" height="40"/>
+</p>
 
 ### Frontend
-- Thymeleaf
-- Bootstrap 4
-- jQuery
-- DataTables
-- Chart.js
-- Font Awesome
+<p align="left">
+    <img src="https://www.vectorlogo.zone/logos/getbootstrap/getbootstrap-icon.svg" alt="bootstrap" width="40" height="40"/>
+    <img src="https://www.vectorlogo.zone/logos/jquery/jquery-icon.svg" alt="jquery" width="40" height="40"/>
+    <img src="https://www.chartjs.org/media/logo-title.svg" alt="chartjs" width="40" height="40"/>
+</p>
 
-## 주요 기능
+## 💻 주요 기능
 
-### 1. 대시보드 (`/main`) - (미구현)
-- 전체 학생 수 현황
-- 진행중인 수업 현황
-- 신규 등록 현황
-- 출석률 통계
-- 시스템 소개
-- 공지사항
+### 1. 대시보드 (`/main`) 
+> ⚠️ 현재 개발 진행 중
+- 전체 학생 수 현황 모니터링
+- 실시간 수업 현황 대시보드
+- 신규 등록 현황 트래킹
+- 출석률 통계 분석
+- 시스템 공지사항 관리
 
-### 2. 학생 관리
-- 학생 목록 조회/추가/수정/삭제 (`/students`)
+### 2. 학생 관리 (`/students`)
+- 학생 정보 CRUD 기능
+- 상세 프로필 관리
 
 ### 3. 분반 관리
-- 분반 목록 조회/추가/수정/삭제 (`/classes`)
+- 분반 정보 관리 (`/classes`)
 - 분반별 학생 관리 (`/class-students`)
 
-### 4. 선생님 관리
-- 선생님 목록 조회/추가/수정/삭제 (`/teachers`)
+### 4. 선생님 관리 (`/teachers`)
+- 교사 정보 CRUD 기능
+- 담당 분반 관리
+- 수업 일정 확인
 
 ### 5. 학습 데이터 관리
 - 학습 데이터 조회 (`/learning-data`)
-- 학습 데이터 등록 (`/learning-data/register`)
-- 학생별 성적 추이 그래프
+- 새로운 학습 데이터 등록 (`/learning-data/register`)
+- 성적 추이 분석 그래프
 
-### 6. 환경설정
-- 시스템 설정 관리 (`/settings`) - (미구현)
+### 6. 환경설정 (`/settings`)
+> ⚠️ 현재 개발 진행 중
+- 시스템 환경설정
+- 사용자 권한 관리
+- 기본 설정 관리
 
+## 🚀 실행 방법
+
+프로젝트를 다운로드 받은 후 스프링 부트 프로젝트를 빌드하여 실행하면 됩니다. 
+데이터베이스 서버는 이미 구축되어 있어 별도의 설정 없이 바로 접속 가능합니다.(평가가 끝나는 대로 서버 종료 예정)
+
+시스템 시작 후 웹 브라우저에서 다음 주소로 접속하여 구현된 기능들을 확인할 수 있습니다:
+```
+http://localhost:8081/main
+```
