@@ -6,7 +6,7 @@
 <div layout:fragment="content">
     <div class="container-fluid">
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <h1 class="h3 mb-0 text-gray-800">학습 데이터 관리</h1>
+            <h1 class="h3 mb-0 text-gray-800">학습 데이터 목록</h1>
             <div>
                 <button id="refreshBtn" class="btn btn-info mr-2" type="button">
                     <i class="fas fa-sync-alt"></i> 새로고침
@@ -202,23 +202,29 @@
             });
         }
 
-        // 차트 객체 선언
+        // 차 객체 선언
         let studyChart = null;
 
         // 차트 초기화 함수
         function initChart(data) {
-            console.log('Initializing chart with data:', data); // 차트 초기화 데이터 확인
+            console.log('Initializing chart with data:', data);
 
-            // 기존 차트가 있다면 제거
             if (studyChart) {
                 studyChart.destroy();
             }
 
-            // 날짜 데이터 확인
-            const labels = data.map(item => item.id.date_column);
+            // 날짜 기준으로 데이터 정렬 (오름차순)
+            data.sort((a, b) => new Date(a.id.date_column) - new Date(b.id.date_column));
+
+            // 날짜 포맷팅 함수
+            const formatDate = (dateStr) => {
+                const date = new Date(dateStr);
+                return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+            };
+
+            const labels = data.map(item => formatDate(item.id.date_column));
             console.log('Chart labels:', labels);
 
-            // 점수 데이터 확인
             const scores = {
                 score1: data.map(item => item.score1),
                 score2: data.map(item => item.score2),
@@ -277,6 +283,12 @@
                         }
                     },
                     scales: {
+                        x: {
+                            ticks: {
+                                maxRotation: 45,
+                                minRotation: 45
+                            }
+                        },
                         y: {
                             beginAtZero: true,
                             max: 100,
