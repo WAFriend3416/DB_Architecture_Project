@@ -21,6 +21,7 @@ MAIS(Math Academy Information System)는 현대적인 수학 학원을 위한 �
 
 ### Frontend
 <p align="left">
+    <img src="https://www.thymeleaf.org/images/thymeleaf.png" alt="thymeleaf" width="40" height="40"/>
     <img src="https://www.vectorlogo.zone/logos/getbootstrap/getbootstrap-icon.svg" alt="bootstrap" width="40" height="40"/>
     <img src="https://www.vectorlogo.zone/logos/jquery/jquery-icon.svg" alt="jquery" width="40" height="40"/>
     <img src="https://www.chartjs.org/media/logo-title.svg" alt="chartjs" width="40" height="40"/>
@@ -38,7 +39,6 @@ MAIS(Math Academy Information System)는 현대적인 수학 학원을 위한 �
 
 ### 2. 학생 관리 (`/students`)
 - 학생 정보 CRUD 기능
-- 상세 프로필 관리
 
 ### 3. 분반 관리
 - 분반 정보 관리 (`/classes`)
@@ -46,8 +46,6 @@ MAIS(Math Academy Information System)는 현대적인 수학 학원을 위한 �
 
 ### 4. 선생님 관리 (`/teachers`)
 - 교사 정보 CRUD 기능
-- 담당 분반 관리
-- 수업 일정 확인
 
 ### 5. 학습 데이터 관리
 - 학습 데이터 조회 (`/learning-data`)
@@ -59,13 +57,3 @@ MAIS(Math Academy Information System)는 현대적인 수학 학원을 위한 �
 - 시스템 환경설정
 - 사용자 권한 관리
 - 기본 설정 관리
-
-## 🚀 실행 방법
-
-프로젝트를 다운로드 받은 후 스프링 부트 프로젝트를 빌드하여 실행하면 됩니다. 
-데이터베이스 서버는 이미 구축되어 있어 별도의 설정 없이 바로 접속 가능합니다.(평가가 끝나는 대로 서버 종료 예정)
-
-시스템 시작 후 웹 브라우저에서 다음 주소로 접속하여 구현된 기능들을 확인할 수 있습니다:
-```
-http://localhost:8081/main
-```
