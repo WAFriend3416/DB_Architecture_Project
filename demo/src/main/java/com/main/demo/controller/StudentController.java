@@ -65,8 +65,14 @@ public class StudentController {
      */
     @GetMapping("/api/students/refresh")
     @ResponseBody
-    public List<Student> refreshStudents() {
-        return studentRepository.findAll();
+    public ResponseEntity<List<Student>> refreshStudents() {
+        try {
+            List<Student> students = studentRepository.findAll();
+            return ResponseEntity.ok(students);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     /**

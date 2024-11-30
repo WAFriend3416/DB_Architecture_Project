@@ -19,50 +19,6 @@ public class MainController {
     }
     
     /**
-     * 수업 목록 페이지를 표시합니다.
-     * @return classes.html 뷰를 반환
-     */
-    @GetMapping("/classes")
-    public String classes() {
-        return "classes";
-    }
-    
-    /**
-     * 수업별 학생 관리 페이지를 표시합니다.
-     * @return class-students.html 뷰를 반환
-     */
-    @GetMapping("/class-students")
-    public String classStudents() {
-        return "class-students";
-    }
-    /**
-     * 선생님 목록 페이지를 표시합니다.
-     * @return teachers.html 뷰를 반환
-     */
-    @GetMapping("/teachers")
-    public String teachers() {
-        return "teachers";
-    }
-    
-    /**
-     * 선생님 분반 현황 페이지를 표시합니다.
-     * @return teacher-classes.html 뷰를 반환
-     */
-    @GetMapping("/teacher-classes")
-    public String teacherClasses() {
-        return "teacher-classes";
-    }
-    
-    /**
-     * 선생님 급여 관리 페이지를 표시합니다.
-     * @return teacher-salary.html 뷰를 반환
-     */
-    @GetMapping("/teacher-salary")
-    public String teacherSalary() {
-        return "teacher-salary";
-    }
-    
-    /**
      * 학습 데이터 목록 페이지를 표시합니다.
      * @return learning-data.html 뷰를 반환
      */

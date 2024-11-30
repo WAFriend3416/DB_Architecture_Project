@@ -9,13 +9,301 @@
 
 <div layout:fragment="content">
     <div class="container-fluid">
-        <h1 class="h3 mb-4 text-gray-800">선생님 목록</h1>
-        <!-- 선생님 목록 테이블 등 컨텐츠 -->
+        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <h1 class="h3 mb-0 text-gray-800">선생님 목록</h1>
+            <div>
+                <button id="refreshBtn" class="btn btn-info mr-2" type="button">
+                    <i class="fas fa-sync-alt"></i> 새로고침
+                </button>
+                <button id="addTeacherBtn" class="btn btn-primary" type="button">
+                    <i class="fas fa-user-plus"></i> 선생님 추가
+                </button>
+            </div>
+        </div>
+
+        <div class="card shadow mb-4">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>선생님 코드</th>
+                                <th>이름</th>
+                                <th>연락처</th>
+                                <th>관리등급</th>
+                                <th>관리</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="teacher : ${teachers}">
+                                <td th:text="${teacher.tCode}"></td>
+                                <td th:text="${teacher.tName}"></td>
+                                <td th:text="${teacher.tContact}"></td>
+                                <td th:text="${teacher.tGrade == 0 ? '관리자' : '선생님'}"></td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm edit-btn" th:attr="data-tcode=${teacher.tCode}">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm delete-btn" th:attr="data-tcode=${teacher.tCode}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 선생님 추가/수정 모달 -->
+    <div class="modal fade" id="addTeacherModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addTeacherModalLabel">선생님 추가</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="addTeacherForm">
+                        <div class="form-group">
+                            <label>선생님 코드 <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="tCode" required maxlength="10">
+                        </div>
+                        <div class="form-group">
+                            <label>이름 <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="tName" required maxlength="50">
+                        </div>
+                        <div class="form-group">
+                            <label>연락처 <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="tContact" required maxlength="20">
+                        </div>
+                        <div class="form-group">
+                            <label>관리등급 <span class="text-danger">*</span></label>
+                            <div class="d-flex align-items-center">
+                                <div class="custom-control custom-radio mr-4">
+                                    <input type="radio" id="grade0" name="tGrade" value="0" class="custom-control-input" required>
+                                    <label class="custom-control-label" for="grade0">0 : 관리자</label>
+                                </div>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" id="grade1" name="tGrade" value="1" class="custom-control-input" required>
+                                    <label class="custom-control-label" for="grade1">1 : 선생님</label>
+                                </div>
+                            </div>
+                            <small class="form-text text-muted">
+                                * 0: 관리자 권한 (모든 기능 접근 가능)<br>
+                                * 1: 선생님 권한 (일반 기능만 접근 가능)
+                            </small>
+                        </div>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" id="saveTeacher" data-mode="add">저장</button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 <th:block layout:fragment="script">
-    <!-- 페이지별 추가 스크립트 -->
+    <!-- DataTables -->
+    <link href="/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <script src="/vendor/datatables/jquery.dataTables.min.js"></script>
+    <script src="/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+    
+    <script>
+    $(document).ready(function() {
+        var table = $('#dataTable').DataTable({
+            processing: true,
+            language: {
+                processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">로딩중...</span>',
+                emptyTable: "데이터가 없습니다",
+                info: "_START_ - _END_ / _TOTAL_",
+                infoEmpty: "0 - 0 / 0",
+                infoFiltered: "(총 _MAX_ 개)",
+                lengthMenu: "페이지당 _MENU_ 개씩 보기",
+                search: "검색:",
+                zeroRecords: "검색 결과가 없습니다"
+            },
+            serverSide: false,
+            ajax: {
+                url: '/api/teachers/refresh',
+                type: 'GET',
+                dataSrc: function(json) {
+                    console.log('받은 데이터:', json);
+                    return json;
+                },
+                error: function(xhr, error, thrown) {
+                    console.error('데이터 로드 중 오류 발생:', error);
+                }
+            },
+            columns: [
+                { data: 'tCode' },
+                { data: 'tName' },
+                { data: 'tContact' },
+                { 
+                    data: 'tGrade',
+                    render: function(data) {
+                        return data === 0 ? '관리자' : '선생님';
+                    }
+                },
+                {   // 관리 버튼 열 추가
+                    data: null,
+                    orderable: false,
+                    searchable: false,
+                    render: function(data, type, row) {
+                        return `
+                            <button class="btn btn-primary btn-sm edit-btn" data-tcode="${row.tCode}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-danger btn-sm delete-btn" data-tcode="${row.tCode}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        `;
+                    }
+                }
+            ],
+            // 로딩 표시 관련 설정
+            dom: 'Bfrtip',
+            pageLength: 10,
+            drawCallback: function() {
+                $('#dataTable').removeClass('loading');
+            }
+        });
+
+        // 새로고침 버튼 클릭 이벤트
+        $('#refreshBtn').on('click', function() {
+            table.ajax.reload(null, false); // 페이지 위치 유지하면서 새로고침
+        });
+
+        // 선생님 추가 버튼 클릭 이벤트
+        $('#addTeacherBtn').on('click', function() {
+            $('#addTeacherModalLabel').text('선생님 추가');
+            $('#addTeacherForm')[0].reset();
+            $('input[name="tCode"]').prop('readonly', false);
+            $('#saveTeacher').data('mode', 'add');
+            $('#addTeacherModal').modal('show');
+        });
+
+        // 저장 버튼 클릭 이벤트
+        $('#saveTeacher').on('click', function() {
+            var mode = $(this).data('mode');
+            var formData = {};
+            
+            $('#addTeacherForm').serializeArray().forEach(function(item) {
+                formData[item.name] = item.value;
+            });
+            
+            var url = '/api/teachers';
+            var method = 'POST';
+            
+            if (mode === 'edit') {
+                url += '/' + formData.tCode;
+                method = 'PUT';
+            }
+            
+            $.ajax({
+                url: url,
+                type: method,
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function(response) {
+                    alert(mode === 'edit' ? '선생님 정보가 수정되었습니다.' : '선생님이 추가되었습니다.');
+                    $('#addTeacherModal').modal('hide');
+                    table.ajax.reload();
+                },
+                error: function(xhr, status, error) {
+                    alert('오류가 발생했습니다: ' + error);
+                }
+            });
+        });
+
+        // 모달이 닫힐 때 초기화
+        $('#addTeacherModal').on('hidden.bs.modal', function () {
+            $('#addTeacherForm')[0].reset();
+            $('input[name="tCode"]').prop('readonly', false);
+            $('#addTeacherModalLabel').text('선생님 추가');
+            $('#saveTeacher').data('mode', 'add');
+        });
+
+        // 수정 버튼 클릭 이벤트
+        $(document).on('click', '.edit-btn', function() {
+            var tCode = $(this).data('tcode');
+            var row = table.row($(this).closest('tr')).data();
+            
+            // 모달 제목 변경
+            $('#addTeacherModalLabel').text('선생님 정보 수정');
+            
+            // 폼에 데이터 채우기
+            $('input[name="tCode"]').val(row.tCode).prop('readonly', true);
+            $('input[name="tName"]').val(row.tName);
+            $('input[name="tContact"]').val(row.tContact);
+            $(`input[name="tGrade"][value="${row.tGrade}"]`).prop('checked', true);
+            
+            // 저장 버튼의 모드를 수정으로 변경
+            $('#saveTeacher').data('mode', 'edit');
+            
+            // 모달 표시
+            $('#addTeacherModal').modal('show');
+        });
+
+        // 삭제 버튼 클릭 이벤트
+        $(document).on('click', '.delete-btn', function() {
+            var tCode = $(this).data('tcode');
+            
+            if (confirm('정말로 이 선생님의 정보를 삭제하시겠습니까?')) {
+                $.ajax({
+                    url: '/api/teachers/' + tCode,
+                    type: 'DELETE',
+                    success: function(response) {
+                        alert('선생님 정보가 삭제되었습니다.');
+                        table.ajax.reload();
+                    },
+                    error: function(xhr, status, error) {
+                        alert('삭제 실패: ' + error);
+                    }
+                });
+            }
+        });
+    });
+    </script>
 </th:block>
 
+<style>
+    /* students.html의 스타일과 동일 */
+    .dataTables_processing {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        padding: 1em;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        z-index: 1000;
+    }
+
+    .table.loading {
+        position: relative;
+    }
+
+    .table.loading:after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.7);
+        z-index: 1;
+    }
+
+    .fa-spin {
+        color: #4e73df;
+    }
+</style>
 </html>

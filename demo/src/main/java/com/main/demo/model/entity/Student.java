@@ -8,6 +8,7 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.List;
 
@@ -53,9 +54,11 @@ public class Student {
     @JsonProperty("sHSchool")
     private String sHSchool;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "student")
     private List<ClassList> classLists;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "student")
     private List<StudyData> studyDataList;
 } 
