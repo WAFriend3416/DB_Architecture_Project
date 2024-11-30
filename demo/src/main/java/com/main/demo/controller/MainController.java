@@ -9,9 +9,6 @@ import com.main.demo.controller.StudentController;
 @Controller
 public class MainController {
     
-    @Autowired
-    private StudentController studentController;
-    
     /**
      * 메인 대시보드 페이지를 표시합니다.
      * @return dashboard.html 뷰를 반환

@@ -1,4 +1,5 @@
-package com.main.demo.entity;
+package com.main.demo.model.entity;
+
 
 import java.io.Serializable;
 import java.time.LocalDate;
