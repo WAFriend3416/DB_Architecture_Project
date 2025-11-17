@@ -289,14 +289,3 @@ CREATE DATABASE math_academy CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 | 성적 관리 | `/learning-data` | 성적 입력 및 조회 |
 | **성적 추이 그래프** | `/learning-data?studentId={sCode}` | **학생별 성적 시각화** ⭐ |
 | 교사 관리 | `/teachers` | 교사 정보 관리 |
-
----
-
-## 📞 문의
-
-- **Repository**: [WAFriend3416/DB_Architecture_Project](https://github.com/WAFriend3416/DB_Architecture_Project)
-- **Issue Tracker**: GitHub Issues
-
----
-
-**Made with ❤️ by WAFriend3416**
